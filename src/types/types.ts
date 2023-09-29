@@ -22,7 +22,7 @@ export type AuthContextType = {
   LOGIN(e: React.FormEvent<HTMLFormElement>, user: USER_TYPE): void
 
   users: USER_TYPE[]
-  getEmail: string
+  userDashData: string
 
   setError: (value: string) => void
   setSuccess: (value: string) => void

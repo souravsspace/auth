@@ -12,7 +12,7 @@ import { auth } from "../firebase/firebase"
 import { useEffect } from "react"
 
 export default function Dashboard() {
-  const { users, getEmail } = useAuthContext()
+  const { users, userDashData } = useAuthContext()
   const navigate = useNavigate()
 
   const localItems = localStorage.getItem("user")
@@ -21,7 +21,9 @@ export default function Dashboard() {
     if (localItems == null) navigate("/")
   }, [localItems])
 
-  const user = users.find((pepole) => pepole.email === getEmail || localItems)
+  const user = users.find((pepole) =>
+    pepole.email.includes(userDashData || localItems!)
+  )
   if (user == null)
     return (
       <div className="bg-white-default w-full h-screen px-1">
@@ -36,7 +38,7 @@ export default function Dashboard() {
           <Typography>
             Hey there!{" "}
             <span className="text-green-400 text-lg font-bold">
-              {user.name?.split(" ")[0]}
+              {user.name!.slice(0, 1).toUpperCase() + user.name?.slice(1, user.name.length)}
             </span>{" "}
             👋
           </Typography>

@@ -19,7 +19,7 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
   const [users, setUsers] = useState<USER_TYPE[]>([])
-  const [getEmail, setGetEmail] = useState("")
+  const [userDashData, setUserDashData] = useState("")
 
   const navigate = useNavigate()
 
@@ -40,7 +40,7 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
       }
     }
     getUsers()
-  }, [getEmail])
+  }, [userDashData])
 
   function singupAuth(user: USER_TYPE) {
     return createUserWithEmailAndPassword(auth, user.email, user.password)
@@ -60,10 +60,22 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
   async function SIGN_UP(e: React.FormEvent<HTMLFormElement>, user: USER_TYPE) {
     e.preventDefault()
 
+    if (users.find((pepole) => pepole.email.includes(user.email))) {
+      return setError("Email already exists")
+    }
+
     if (user.password !== user.passwordConfirm)
       return setError("Passwords do not match")
     if (user.password.length < 8)
       return setError("Password must be 8+ characters")
+
+    if (!user.age) {
+      return setError("Age is required")
+    } else if (user.age > 100) {
+      return setError("Enter a valid age")
+    } else if (user.age < 10) {
+      return setError("Enter a valid age")
+    }
 
     try {
       setError("")
@@ -95,6 +107,14 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
   async function LOGIN(e: React.FormEvent<HTMLFormElement>, user: USER_TYPE) {
     e.preventDefault()
 
+    if(!users.find((pepole) => pepole.email.includes(user.email))) {
+      return setError("Email not found")
+    }
+
+    if(!users.find((pepole) => pepole.password.includes(user.password))) {
+      return setError("Incorrect password")
+    }
+    
     try {
       setError("")
       setLoading(true)
@@ -105,7 +125,7 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
       const userAuth = { email, password }
       await loginAuth(userAuth)
 
-      setGetEmail(user.email)
+      setUserDashData(user.email)
       setSuccess("Logged in successfully")
 
       localStorage.setItem("user", userAuth.email)
@@ -140,7 +160,7 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
         loading,
         success,
         users,
-        getEmail,
+        userDashData,
 
         setError,
         setLoading,
