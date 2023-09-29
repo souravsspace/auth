@@ -21,12 +21,6 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
   const [users, setUsers] = useState<USER_TYPE[]>([])
   const [getEmail, setGetEmail] = useState("")
 
-  // const deleteLocal = setTimeout(() => {
-  //   localStorage.removeItem("user")
-  // }, 86400000)
-
-  // clearTimeout(deleteLocal)
-
   const navigate = useNavigate()
 
   const usersCollectionRef = collection(fireStore, "user_data")
