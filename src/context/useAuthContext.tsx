@@ -3,37 +3,11 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
 } from "firebase/auth"
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react"
-import { auth } from "../firebase/firebase"
+import { createContext, useContext, useEffect, useState } from "react"
+import { auth, fireStore } from "../firebase/firebase"
 import { useNavigate } from "react-router-dom"
-
-type AuthContextProvider = {
-  children: ReactNode
-}
-
-type USER_TYPE = {
-  name?: string
-  age?: number
-  email: string
-  password: string
-  passwordConfirm?: string
-}
-
-type AuthContextType = {
-  error: string
-  success: string
-  loading: boolean
-  currentUser: USER_TYPE | null
-
-  SIGN_UP(e: React.FormEvent<HTMLFormElement>, user: USER_TYPE): void
-  LOGIN(e: React.FormEvent<HTMLFormElement>, user: USER_TYPE): void
-}
+import { AuthContextProvider, AuthContextType, USER_TYPE } from "../types/types"
+import { addDoc, collection, getDocs } from "firebase/firestore"
 
 const AuthContext = createContext({} as AuthContextType)
 export const useAuthContext = () => useContext(AuthContext)
@@ -44,8 +18,29 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
+  const [users, setUsers] = useState<USER_TYPE[]>([])
+  const [getEmail, setGetEmail] = useState("")
 
   const navigate = useNavigate()
+
+  const usersCollectionRef = collection(fireStore, "user_data")
+
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const data = await getDocs(usersCollectionRef)
+        setUsers(
+          data.docs.map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as USER_TYPE),
+          }))
+        )
+      } catch (err) {
+        console.log(err)
+      }
+    }
+    getUsers()
+  }, [])
 
   function singupAuth(user: USER_TYPE) {
     return createUserWithEmailAndPassword(auth, user.email, user.password)
@@ -80,34 +75,56 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
 
       const userAuth = { email, password }
       await singupAuth(userAuth)
-      navigate("/dashboard")
+      await addDoc(usersCollectionRef, {
+        name: user.name,
+        age: user.age,
+        email: user.email,
+        password: user.password,
+      })
+
+      navigate("/")
     } catch {
       setError("Failed to create an account")
       setSuccess("")
     }
     setLoading(false)
+    setError("")
+    setSuccess("")
   }
 
   async function LOGIN(e: React.FormEvent<HTMLFormElement>, user: USER_TYPE) {
     e.preventDefault()
 
     try {
+      setError("")
+      setLoading(true)
+
       const email = user.email
       const password = user.password
 
-      setError("")
-      setLoading(true)
-      setSuccess("Logged in successfully")
-
       const userAuth = { email, password }
       await loginAuth(userAuth)
-      navigate("/dashboard")
+      setGetEmail(user.email)
+      setSuccess("Logged in successfully")
+      setTimeout(() => {
+        navigate("/dashboard")
+      }, 1000)
     } catch {
       setError("Failed to login")
-      setSuccess("")
     }
     setLoading(false)
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setError("")
+      setSuccess("")
+    }, 1500)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [error, success])
 
   return (
     <AuthContext.Provider
@@ -118,6 +135,12 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
         error,
         loading,
         success,
+        users,
+        getEmail,
+
+        setError,
+        setLoading,
+        setSuccess,
       }}
     >
       {children}
