@@ -15,7 +15,7 @@ export function Login() {
   }
 
   return (
-    <main className="w-full mx-1 h-screen flex items-center justify-center bg-white-default">
+    <main className="w-full px-1 h-screen flex items-center justify-center bg-white-default">
       <Card
         color="transparent"
         shadow={false}

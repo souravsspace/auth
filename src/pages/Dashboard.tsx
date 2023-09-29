@@ -22,7 +22,12 @@ export default function Dashboard() {
   }, [localItems])
 
   const user = users.find((pepole) => pepole.email === getEmail || localItems)
-  if (user == null) return <div className="text-center bg-red-50 p-4">no user found!</div>
+  if (user == null)
+    return (
+      <div className="bg-white-default w-full h-screen px-1">
+        <div className="text-center bg-red-50 p-4 mx-1">no user found!</div>
+      </div>
+    )
 
   return (
     <main className="bg-white-default w-full h-screen flex items-center justify-center flex-col">
