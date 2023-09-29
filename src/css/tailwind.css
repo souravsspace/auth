@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --clr-white: 245, 245, 245;
+    --clr-white-blue: 236, 249, 255;
+    --clr-black: 39, 40, 41;
+    --clr-black-dark: 4, 13, 18;
+    --clr-primary: 135, 133, 162;
+  }
+  /* @media (prefers-color-scheme="dark") { */
+  .light {
+    --clr-white: 245, 245, 245;
+    --clr-white-blue: 236, 249, 255;
+    --clr-black: 39, 40, 41;
+    --clr-black-dark: 4, 13, 18;
+  }
+  .dark {
+    --clr-white: 4, 13, 18;
+    --clr-white-blue: 39, 40, 41;
+    --clr-black: 236, 249, 255;
+    --clr-black-dark: 245, 245, 245;
+  }
+  /* } */
+}
