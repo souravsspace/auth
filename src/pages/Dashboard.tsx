@@ -5,7 +5,6 @@ import {
   Card,
   CardBody,
   CardFooter,
-  CardHeader,
   Typography,
 } from "@material-tailwind/react"
 import { signOut } from "firebase/auth"
