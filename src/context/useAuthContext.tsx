@@ -21,6 +21,12 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
   const [users, setUsers] = useState<USER_TYPE[]>([])
   const [getEmail, setGetEmail] = useState("")
 
+  // const deleteLocal = setTimeout(() => {
+  //   localStorage.removeItem("user")
+  // }, 86400000)
+
+  // clearTimeout(deleteLocal)
+
   const navigate = useNavigate()
 
   const usersCollectionRef = collection(fireStore, "user_data")
@@ -40,7 +46,7 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
       }
     }
     getUsers()
-  }, [])
+  }, [getEmail])
 
   function singupAuth(user: USER_TYPE) {
     return createUserWithEmailAndPassword(auth, user.email, user.password)
@@ -104,8 +110,12 @@ export default function AuthContextProvider({ children }: AuthContextProvider) {
 
       const userAuth = { email, password }
       await loginAuth(userAuth)
+
       setGetEmail(user.email)
       setSuccess("Logged in successfully")
+
+      localStorage.setItem("user", userAuth.email)
+
       setTimeout(() => {
         navigate("/dashboard")
       }, 1000)

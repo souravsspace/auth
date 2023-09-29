@@ -9,14 +9,14 @@ export default function Dashboard() {
   const { users, getEmail } = useAuthContext()
   const navigate = useNavigate()
 
+  const localItems = localStorage.getItem("user")
+
   useEffect(() => {
-    if (getEmail === "") navigate("/")
-  }, [getEmail])
+    if (localItems == null) navigate("/")
+  }, [localItems])
 
-  const user = users.find((user) => user.email === getEmail)
+  const user = users.find((user) => user.email === (getEmail || localItems))
   if (user == null) return null
-
-  console.log(user)
 
   return (
     <div>
@@ -26,8 +26,10 @@ export default function Dashboard() {
       <Button
         onClick={() => {
           signOut(auth)
+          localStorage.removeItem("user")
           navigate("/")
         }}
+        className="text-white-default bg-black-dark"
       >
         Logout
       </Button>
